@@ -95,12 +95,20 @@ public class SoftBody {
 	}
 	public void destroyBody(){
         Iterator<PhysObject> it=physObject.iterator();
-        Vector2 avgPos = new Vector2(0,0);
         while(it.hasNext())
         {
         	PhysObject cObj=(PhysObject)it.next();
         	cObj.destroyBody(world);
         }
+	}
+	public void dispose(){
+        Iterator<PhysObject> it=physObject.iterator();
+        while(it.hasNext())
+        {
+        	PhysObject cObj=(PhysObject)it.next();
+        	cObj.dispose();
+        }
+        
 	}
 	public void createFromDef(){
         Vector2 avgPos = new Vector2(0,0);
@@ -215,6 +223,17 @@ public class SoftBody {
 	public void makeLoop() {
 		isLoop = true;
 		
+	}
+	public boolean containsBody(Body checkMe) {
+        Iterator<PhysObject> it=physObject.iterator();
+        while(it.hasNext())
+        {
+        	PhysObject cObj=(PhysObject)it.next();
+        	if(cObj.body == checkMe){
+        		return true;
+        	}
+        }
+		return false;
 	}
 
 }

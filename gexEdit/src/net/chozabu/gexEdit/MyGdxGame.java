@@ -27,6 +27,8 @@ public class MyGdxGame implements ApplicationListener {
     private World mWorld;
     
     boolean runStep = true;
+    boolean frozen = true;
+    float gravity = -9.81f;
     
     InputModule inputModule;
     public float PPM;//pixels per meter
@@ -58,7 +60,7 @@ public class MyGdxGame implements ApplicationListener {
 		
 		debugRenderer = new Box2DDebugRenderer();
 		//assetManager = new AssetManager();
-        mWorld = new World(new Vector2(0, -9.81f), true);
+        mWorld = new World(new Vector2(0, gravity), true);
 		//camera = new OrthographicCamera(1, h/w);
         camWidth = 50;
         PPM = pixWidth/camWidth;
@@ -96,9 +98,9 @@ public class MyGdxGame implements ApplicationListener {
        
         
         //make a floor of squares
-        int fc = -25;
-        while (fc<25){
-        	fc+=4;
+        int fc = -50;
+        while (fc<50){
+        	fc+=8;
             PhysObject sObj = new PhysObject();
             sObj.createBox(mWorld, fc,-camHeight/2f,4,4, regionBox,BodyType.StaticBody);
             physObject.add(sObj);
@@ -146,7 +148,16 @@ public class MyGdxGame implements ApplicationListener {
         	cObj.reset();
         }
 	}
-	public void delPBs(){
+	public SoftBody getSB(Body checkMe){
+        Iterator<SoftBody> softit=softBody.iterator();
+        while(softit.hasNext())
+        {
+        	SoftBody cObj=(SoftBody)softit.next();
+        	if(cObj.containsBody(checkMe)) return cObj;
+        }
+		return null;
+	}
+	/*public void delPBs(){
         Iterator<PhysObject> it=physObject.iterator();
         while(it.hasNext())
         {
@@ -160,7 +171,7 @@ public class MyGdxGame implements ApplicationListener {
         	SoftBody cObj=(SoftBody)softit.next();
         	cObj.destroyBody();
         }
-	}
+	}*/
 
 	@Override
 	public void dispose() {
@@ -171,6 +182,24 @@ public class MyGdxGame implements ApplicationListener {
 	@Override
 	public void render() {
         //mWorld.step(Gdx.app.getGraphics().getDeltaTime(), 3, 3);
+		if(frozen){
+			mWorld.setGravity(Vector2.Zero);
+			Iterator<Body> pbi = mWorld.getBodies();
+			while(pbi.hasNext()){
+				Body cb = pbi.next();
+				cb.setLinearVelocity(0, 0);
+				cb.setAngularVelocity(0);
+			}
+			
+		} else {
+			mWorld.setGravity(new Vector2(0,-9.81f));
+			Iterator<Body> pbi = mWorld.getBodies();
+			while(pbi.hasNext()){
+				Body cb = pbi.next();
+				cb.setAwake(true);
+			}
+			
+		}
 		if(runStep)
         mWorld.step(1.f/60.f, 3, 3);
         

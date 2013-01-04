@@ -30,6 +30,11 @@ public class PhysObject {
 	float scale = 1;
 
 	public void draw(SpriteBatch batch) {
+        sprite.setPosition(bodyDef.position.x-sprite.getWidth()/2, bodyDef.position.y-sprite.getHeight()/2);
+        //System.out.println(transform.getRotation()*MathUtils.radiansToDegrees);
+        sprite.setRotation(bodyDef.angle*MathUtils.radiansToDegrees);
+        sprite.setColor(1, 1, 1, 0.1f);
+        sprite.draw(batch);
 		if (body == null) {
 			sprite.draw(batch);
 			//System.out.println("no body");
@@ -39,6 +44,7 @@ public class PhysObject {
         sprite.setPosition(transform.getPosition().x-sprite.getWidth()/2, transform.getPosition().y-sprite.getHeight()/2);
         //System.out.println(transform.getRotation()*MathUtils.radiansToDegrees);
         sprite.setRotation(transform.getRotation()*MathUtils.radiansToDegrees);
+        sprite.setColor(1, 1, 1, 1f);
         sprite.draw(batch);
         //sprite.setPosition(transform.getPosition().x-sprite.getWidth()/2+5, transform.getPosition().y-sprite.getHeight()/2);
         //sprite.draw(batch);
@@ -51,6 +57,17 @@ public class PhysObject {
 		bodyDef.position.set(x, y);
 
 		setShapeCircle(rad);
+		setupFixture();
+	}
+	public void setDefBox(float x, float y, float w,float h, TextureRegion region, BodyType bType){		//sprite = pSprite;
+		setupSprite(x,y,w,h, region);
+
+		bodyDef = new BodyDef();
+		bodyDef.type = bType;
+		bodyDef.position.set(x, y);
+		//bodyDef.angle=0f;
+		
+		setShapePoly(w,h);
 		setupFixture();
 	}
 	public void setShapePoly(float w,float h){
@@ -78,17 +95,6 @@ public class PhysObject {
 		sprite.setPosition(x-sprite.getWidth()/2, y-sprite.getHeight()/2);
 		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
 	}
-	public void setDefBox(float x, float y, float w,float h, TextureRegion region, BodyType bType){		//sprite = pSprite;
-		setupSprite(x,y,w,h, region);
-
-		bodyDef = new BodyDef();
-		bodyDef.type = bType;
-		bodyDef.position.set(x, y);
-		bodyDef.angle=0f;
-		
-		setShapePoly(w,h);
-		setupFixture();
-	}
 
 	public void createFromDef(World world){		//sprite = pSprite;
 		if (body!=null)
@@ -115,7 +121,8 @@ public class PhysObject {
 		createFromDef(world);
 	}
 	public void destroyBody(World world){
-		world.destroyBody(body);
+		if(body!=null)
+			world.destroyBody(body);
 		body = null;
 	}
 	public void setDefAngle(float angle) {
@@ -167,6 +174,10 @@ public class PhysObject {
 			shape = null;
 		}
 		
+	}
+	public void defFromPos() {
+		bodyDef.position.set(body.getPosition().cpy());
+		bodyDef.angle = body.getAngle();
 	}
 		
 }

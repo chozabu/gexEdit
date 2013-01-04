@@ -42,11 +42,16 @@ public class InputModule implements InputProcessor {
 		if (mode == Modes.Interact)
 			dragControl.keyDown(keycode);
 		
-		if (keycode == Keys.R)
+		if (keycode == Keys.R){
 			root.resetAll();
+			root.frozen = true;
+		}
 
 		if (keycode == Keys.TAB){
-			root.runStep = !root.runStep;
+			if (root.frozen)
+				root.frozen = false;
+			else
+				root.runStep = !root.runStep;
 			//root.resetAll();
 			//root.render();
 			//root.delPBs();
