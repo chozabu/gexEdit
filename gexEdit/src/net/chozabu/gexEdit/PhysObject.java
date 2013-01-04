@@ -95,10 +95,11 @@ public class PhysObject {
 			world.destroyBody(body);
 		body = world.createBody(bodyDef);
 		//body.applyTorque(1000);
-		//body.setUserData("asd");
+		body.setUserData(this);
 		//body.getUserData();
 		// Create our fixture and attach it to the body
 		fixture = body.createFixture(fixtureDef);
+		//sprite.setScale(1*0.5f);
 	}
 
 	public void createCircle(World world, float rad,float x, float y, TextureRegion region, BodyType bType) {
@@ -123,29 +124,41 @@ public class PhysObject {
 	public void setDefAngle(float angle) {
 		bodyDef.angle=angle;
 		sprite.setRotation(angle/MathUtils.degreesToRadians);
-		System.out.println(angle);
 	}
 	public void setDefSize(float dist) {
 		sprite.setScale(dist*0.5f);
-		Shape.Type sType = shape.getType();
+		scaleShape(dist,shape);
+		
+	}
+	public void setLiveSize(float dist) {
+		sprite.setScale(dist*0.5f);
+		Fixture f = body.getFixtureList().get(0);
+		Shape s = f.getShape();
+		scaleShape(dist,s);
+		
+	}
+	void scaleShape(float dist, Shape shapeIn){
+		//sprite.setScale(dist*0.5f);
+		Shape.Type sType = shapeIn.getType();
 		if (sType == Shape.Type.Circle){
-			CircleShape cs = (CircleShape)shape;
+			CircleShape cs = (CircleShape)shapeIn;
 			cs.setRadius(dist);
 		}else if (sType == Shape.Type.Polygon){
-			PolygonShape ps = (PolygonShape)shape;
-			/*int vCount = ps.getChildCount();
+			PolygonShape ps = (PolygonShape)shapeIn;
+			ps.setAsBox(dist, dist);
+			/*//TODO use something like this to scale any poly :) (box only has one vertex?)
+			 * int vCount = ps.getChildCount();
 			Vector2[] verts = new Vector2[vCount];
 			Vector2 cVert = Vector2.Zero;
 			for (int i = 0; i < vCount;i++){
 				ps.getVertex(i, cVert);
-				cVert.x*=1.1;
+				cVert.x*=1.1;//TODO dont use 1.1 here!
 				verts[i]=cVert;
 			}
 			System.out.println(vCount);
 			ps.set(verts);*/
-			ps.setAsBox(dist, dist);
-			//for ()
 		}
-		
+			
 	}
+		
 }

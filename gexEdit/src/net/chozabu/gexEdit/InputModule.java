@@ -11,10 +11,11 @@ public class InputModule implements InputProcessor {
 	CamControl camControl;
 	BoxAddingControl boxAddingControl;
 	DragControl dragControl;
+	LiveResizeControl liveResizeControl;
 	
 
 	public enum Modes {
-		Camera, Drawing, Transform, Interact, Select, Box,Circle
+		Camera, Drawing, Transform, Interact, Box,Circle,Resize//Select
 	};
 	
 	Modes mode;
@@ -22,17 +23,23 @@ public class InputModule implements InputProcessor {
 	
 	public void setInfo (MyGdxGame rootIn){
 		root=rootIn;
-		mode = Modes.Drawing;
+		mode = Modes.Interact;
 		drawingControl = new DrawingControl();
 		drawingControl.setInfo(root);
 		camControl = new CamControl();
 		camControl.setInfo(root);
 		boxAddingControl = new BoxAddingControl(root);
 		dragControl = new DragControl(root);
+		liveResizeControl = new LiveResizeControl(root);
 	}
 
 	@Override
 	public boolean keyDown(int keycode) {
+		
+
+		if (mode == Modes.Box)
+			boxAddingControl.keyDown(keycode);
+		
 		if (keycode == Keys.R)
 			root.resetAll();
 
@@ -42,17 +49,26 @@ public class InputModule implements InputProcessor {
 			//root.render();
 			//root.delPBs();
 		}
-		
+
+		if (keycode == Keys.S)
+			root.bType = BodyType.StaticBody;
+		if (keycode == Keys.D)
+			root.bType = BodyType.DynamicBody;
+
+		//set mode (drawing tool)//TODO make "tool" interface to set currentTool
 		if (keycode == Keys.Z)
-			mode = Modes.Interact;
+			mode = Modes.Interact;//running, transform when static?
 		if (keycode == Keys.X)
-			mode = Modes.Select;
+			mode = Modes.Interact;
+			//mode = Modes.Select;
 		if (keycode == Keys.C)
-			mode = Modes.Camera;
+			mode = Modes.Camera;//either
 		if (keycode == Keys.V)
-			mode = Modes.Drawing;
+			mode = Modes.Drawing;//static, mostly
 		if (keycode == Keys.B)
-			mode = Modes.Box;
+			mode = Modes.Box;//static, mostly
+		if (keycode == Keys.N)
+			mode = Modes.Resize;
 		//creationObject.createFromDef();
 		// TODO Auto-generated method stub
 		return false;
@@ -86,6 +102,8 @@ public class InputModule implements InputProcessor {
 		if (mode == Modes.Interact){
 			dragControl.touchDown(screenX,screenY,pointer,button);
 		}
+		if (mode == Modes.Resize)
+			liveResizeControl.touchDown(screenX,screenY,pointer,button);
 		return false;
 	}
 
@@ -102,6 +120,8 @@ public class InputModule implements InputProcessor {
 		if (mode == Modes.Interact){
 			dragControl.touchUp(screenX,screenY,pointer, button);
 		}
+		if (mode == Modes.Resize)
+			liveResizeControl.touchUp(screenX,screenY,pointer,button);
 		return false;
 	}
 
@@ -120,6 +140,8 @@ public class InputModule implements InputProcessor {
 		if (mode == Modes.Interact){
 			dragControl.touchDragged(screenX,screenY,pointer);
 		}
+		if (mode == Modes.Resize)
+			liveResizeControl.touchDragged(screenX,screenY,pointer);
 		return false;
 	}
 

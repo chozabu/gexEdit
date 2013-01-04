@@ -4,8 +4,10 @@
 	<source path="gdx">
 		<include name="src/net/chozabu/gexEdit/BoxAddingControl.java"/>
 		<include name="src/net/chozabu/gexEdit/CamControl.java"/>
+		<include name="src/net/chozabu/gexEdit/DragControl.java"/>
 		<include name="src/net/chozabu/gexEdit/DrawingControl.java"/>
 		<include name="src/net/chozabu/gexEdit/InputModule.java"/>
+		<include name="src/net/chozabu/gexEdit/LiveResizeControl.java"/>
 		<include name="src/net/chozabu/gexEdit/MyGdxGame.java"/>
 		<include name="src/net/chozabu/gexEdit/PhysObject.java"/>
 		<include name="src/net/chozabu/gexEdit/SoftBody.java"/>

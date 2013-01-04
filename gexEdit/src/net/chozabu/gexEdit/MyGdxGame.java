@@ -41,6 +41,8 @@ public class MyGdxGame implements ApplicationListener {
     List<PhysObject> physObject;
     List<SoftBody> softBody;
     
+    public BodyType bType = BodyType.DynamicBody;
+    
     TextureRegion region;//default texture region
 	
 	/* (non-Javadoc)
