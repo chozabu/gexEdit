@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="com.badlogic.gdx">
+	<inherits name="com.esotericsoftware.tablelayout"/>
+	<source path="gdx">
+		<include name="src/net/chozabu/gexEdit/CamControl.java"/>
+		<include name="src/net/chozabu/gexEdit/DrawingControl.java"/>
+		<include name="src/net/chozabu/gexEdit/InputModule.java"/>
+		<include name="src/net/chozabu/gexEdit/MyGdxGame.java"/>
+		<include name="src/net/chozabu/gexEdit/PhysObject.java"/>
+		<include name="src/net/chozabu/gexEdit/SoftBody.java"/>
+		<include name="graphics/g2d/Animation.java"/>
+		<include name="graphics/g3d/Animation.java"/>
+	</source>
+</module>
