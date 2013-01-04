@@ -235,5 +235,13 @@ public class SoftBody {
         }
 		return false;
 	}
+	public void defFromPos() {
+        Iterator<PhysObject> it=physObject.iterator();
+        while(it.hasNext())
+        {
+        	PhysObject cObj=(PhysObject)it.next();
+        	cObj.defFromPos();
+        }
+	}
 
 }
