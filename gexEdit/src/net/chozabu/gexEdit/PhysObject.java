@@ -118,9 +118,6 @@ public class PhysObject {
 		world.destroyBody(body);
 		body = null;
 	}
-	public void rmBody(World world){
-		world.destroyBody(body);
-	}
 	public void setDefAngle(float angle) {
 		bodyDef.angle=angle;
 		sprite.setRotation(angle/MathUtils.degreesToRadians);
@@ -159,6 +156,17 @@ public class PhysObject {
 			ps.set(verts);*/
 		}
 			
+	}
+	public void dispose() {
+		if(body!=null){
+			body.getWorld().destroyBody(body);
+			body=null;
+		}
+		if(shape!=null){
+			shape.dispose();
+			shape = null;
+		}
+		
 	}
 		
 }

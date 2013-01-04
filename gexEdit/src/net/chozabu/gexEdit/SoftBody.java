@@ -2,6 +2,7 @@ package net.chozabu.gexEdit;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -30,7 +31,8 @@ public class SoftBody {
 	World world;
 	TextureRegion region;
 	boolean isLoop;
-
+	
+	PhysObject centreBody;
 	public void draw(SpriteBatch batch) {
         Iterator<PhysObject> it=physObject.iterator();
         while(it.hasNext())
@@ -101,8 +103,24 @@ public class SoftBody {
         }
 	}
 	public void createFromDef(){
-        Iterator<PhysObject> it=physObject.iterator();
         Vector2 avgPos = new Vector2(0,0);
+        Iterator<PhysObject> it=physObject.iterator();
+        List<PhysObject> rems;
+        rems = new LinkedList<PhysObject>();
+        while(it.hasNext())
+        {
+        	PhysObject cObj=(PhysObject)it.next();
+        	if(cObj.shape == null){
+        		rems.add(cObj);
+        	}
+        }
+        it=rems.iterator();
+        while(it.hasNext())
+        {
+        	PhysObject cObj=(PhysObject)it.next();
+        		physObject.remove(cObj);
+        }
+        it=physObject.iterator();
         while(it.hasNext())
         {
         	PhysObject cObj=(PhysObject)it.next();
@@ -120,8 +138,15 @@ public class SoftBody {
         if (isLoop){
         	lastObj = physObject.get(physObject.size()-1);
         	lastObj2 = physObject.get(physObject.size()-2);
+        	if(physObject.size()>2)
         	lastObj3 = physObject.get(physObject.size()-3);
         }
+        /*if (centreBody!=null){
+        	centreBody.dispose();
+        }
+        centreBody = new PhysObject();
+        centreBody.createCircle(world, 1, avgPos.x, avgPos.y, region, BodyType.DynamicBody);
+        */
         //lastObj2.createFromDef(world);
         it=physObject.iterator();
         int index = 0; int olen = physObject.size();
@@ -131,6 +156,7 @@ public class SoftBody {
         	//if (cObj.body == null)
         	//cObj.createFromDef(world);
         	if (lastObj!=null){
+        		//connect neighbouring vertices
         		//DistanceJointDef mjd = new DistanceJointDef();
         		WeldJointDef mjd = new WeldJointDef();
         		mjd.initialize(cObj.body, lastObj.body, cObj.body.getPosition());//,lastObj.body.getPosition());
@@ -138,9 +164,9 @@ public class SoftBody {
         		//mjd.frequencyHz=5f;
         		world.createJoint(mjd);
         		
-        		
-        		/*//connect opposing sides//
-        		PhysObject poR = physObject.get((index+olen/2)%olen);
+        		///connect distant sides//
+        		PhysObject poR = physObject.get((index+olen/4)%olen);
+        		if (poR.body!=cObj.body){
         		DistanceJointDef mjdR = new DistanceJointDef();
         		//PrismaticJointDef mjdR = new PrismaticJointDef();
         		mjdR.initialize(cObj.body, poR.body, cObj.body.getPosition(),poR.body.getPosition());
@@ -149,7 +175,18 @@ public class SoftBody {
         		//Vector2 axis=cObj.body.getPosition().cpy().sub(poR.body.getPosition());
         		//mjdR.initialize(cObj.body, poR.body, cObj.body.getPosition(),axis.nor());
         		world.createJoint(mjdR);
-        		*/
+        		}
+        		//*/
+        		/*/connect centre sides//
+        		PhysObject poR = centreBody;
+        		DistanceJointDef mjdR = new DistanceJointDef();
+        		//PrismaticJointDef mjdR = new PrismaticJointDef();
+        		mjdR.initialize(cObj.body, poR.body, cObj.body.getPosition(),poR.body.getPosition());
+        		mjdR.dampingRatio=0.5f;
+        		mjdR.frequencyHz=5;
+        		//Vector2 axis=cObj.body.getPosition().cpy().sub(poR.body.getPosition());
+        		//mjdR.initialize(cObj.body, poR.body, cObj.body.getPosition(),axis.nor());
+        		world.createJoint(mjdR);//*/
         		
             	if (lastObj2!=null){
             		DistanceJointDef mjd2 = new DistanceJointDef();
@@ -157,7 +194,7 @@ public class SoftBody {
             		mjd2.dampingRatio=0.5f;
             		mjd2.frequencyHz=5f;
             		DistanceJoint tj = (DistanceJoint)world.createJoint(mjd2);
-                	if (lastObj3!=null){
+                	if (lastObj3!=null) if(cObj.body != lastObj3.body){
                 		DistanceJointDef mjd3 = new DistanceJointDef();
                 		mjd3.initialize(cObj.body, lastObj3.body, cObj.body.getPosition(),lastObj3.body.getPosition());
                 		mjd3.dampingRatio=0.5f;

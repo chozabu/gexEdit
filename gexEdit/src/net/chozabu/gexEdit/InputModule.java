@@ -39,6 +39,8 @@ public class InputModule implements InputProcessor {
 
 		if (mode == Modes.Box)
 			boxAddingControl.keyDown(keycode);
+		if (mode == Modes.Interact)
+			dragControl.keyDown(keycode);
 		
 		if (keycode == Keys.R)
 			root.resetAll();
