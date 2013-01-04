@@ -79,26 +79,29 @@ public class MyGdxGame implements ApplicationListener {
         PhysObject pObj = new PhysObject();
         pObj.createCircle(mWorld, bRad, 0,0, region,BodyType.DynamicBody);
         physObject.add(pObj);
+        
         inputModule = new InputModule();
         inputModule.setInfo(this);
         Gdx.input.setInputProcessor(inputModule);
         
-
+        
         PhysObject mObj = new PhysObject();
-        mObj.createSquare(mWorld,0.f,-camHeight*2,camWidth*10,1.f, region,BodyType.StaticBody);
+        mObj.createBox(mWorld,0.f,-camHeight*2,camWidth*10,1.f, region,BodyType.StaticBody);
             physObject.add(mObj);
         
        
         
+        //make a floor of squares
         int fc = -25;
         while (fc<25){
         	fc+=4;
             PhysObject sObj = new PhysObject();
-            sObj.createSquare(mWorld, fc,-camHeight/2f,4,4, region,BodyType.StaticBody);
+            sObj.createBox(mWorld, fc,-camHeight/2f,4,4, region,BodyType.StaticBody);
             physObject.add(sObj);
         }
         
-
+        
+        //try out a random chain shape
 		ChainShape chainShape = new ChainShape();
 		chainShape.createLoop(new Vector2[] {new Vector2(-10, 10), new Vector2(-10, 5), new Vector2(10, 5), new Vector2(10, 11),});
 		BodyDef chainBodyDef = new BodyDef();
@@ -109,6 +112,9 @@ public class MyGdxGame implements ApplicationListener {
 
 
         
+	}
+	public World getWorld(){
+		return mWorld;
 	}
 	public SoftBody quickNewSoft(){
 		SoftBody newsoft = new SoftBody();

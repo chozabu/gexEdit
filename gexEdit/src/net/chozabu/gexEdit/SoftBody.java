@@ -116,9 +116,11 @@ public class SoftBody {
         //physObject.get(physObject.size()-1);
         //System.out.println(lastObj);
         PhysObject lastObj2 = null;//physObject.get(physObject.size()-2);
+        PhysObject lastObj3 = null;//physObject.get(physObject.size()-2);
         if (isLoop){
         	lastObj = physObject.get(physObject.size()-1);
         	lastObj2 = physObject.get(physObject.size()-2);
+        	lastObj3 = physObject.get(physObject.size()-3);
         }
         //lastObj2.createFromDef(world);
         it=physObject.iterator();
@@ -132,15 +134,12 @@ public class SoftBody {
         		//DistanceJointDef mjd = new DistanceJointDef();
         		WeldJointDef mjd = new WeldJointDef();
         		mjd.initialize(cObj.body, lastObj.body, cObj.body.getPosition());//,lastObj.body.getPosition());
-        		//mjd.initialize(cObj.body, lastObj.body, cObj.body.getPosition(),lastObj.body.getPosition());
         		//mjd.dampingRatio=0.f;
         		//mjd.frequencyHz=5f;
-        		//world.createJoint(mjd);
-        		//mjd.initialize(cObj.body, lastObj.body, cObj.body.getPosition());//,lastObj.body.getPosition());
         		world.createJoint(mjd);
         		
         		
-        		
+        		/*//connect opposing sides//
         		PhysObject poR = physObject.get((index+olen/2)%olen);
         		DistanceJointDef mjdR = new DistanceJointDef();
         		//PrismaticJointDef mjdR = new PrismaticJointDef();
@@ -150,15 +149,24 @@ public class SoftBody {
         		//Vector2 axis=cObj.body.getPosition().cpy().sub(poR.body.getPosition());
         		//mjdR.initialize(cObj.body, poR.body, cObj.body.getPosition(),axis.nor());
         		world.createJoint(mjdR);
+        		*/
+        		
             	if (lastObj2!=null){
             		DistanceJointDef mjd2 = new DistanceJointDef();
             		mjd2.initialize(cObj.body, lastObj2.body, cObj.body.getPosition(),lastObj2.body.getPosition());
             		mjd2.dampingRatio=0.5f;
             		mjd2.frequencyHz=5f;
             		DistanceJoint tj = (DistanceJoint)world.createJoint(mjd2);
-            		//tj.setLength(tj.getLength()*0.9f);
+                	if (lastObj3!=null){
+                		DistanceJointDef mjd3 = new DistanceJointDef();
+                		mjd3.initialize(cObj.body, lastObj3.body, cObj.body.getPosition(),lastObj3.body.getPosition());
+                		mjd3.dampingRatio=0.5f;
+                		mjd3.frequencyHz=5f;
+                		world.createJoint(mjd3);
+                	}
             	}
         	}
+        	lastObj3 = lastObj2;
         	lastObj2 = lastObj;
         	lastObj = cObj;
         	

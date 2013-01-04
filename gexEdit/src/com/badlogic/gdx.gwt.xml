@@ -2,6 +2,7 @@
 <module rename-to="com.badlogic.gdx">
 	<inherits name="com.esotericsoftware.tablelayout"/>
 	<source path="gdx">
+		<include name="src/net/chozabu/gexEdit/BoxAddingControl.java"/>
 		<include name="src/net/chozabu/gexEdit/CamControl.java"/>
 		<include name="src/net/chozabu/gexEdit/DrawingControl.java"/>
 		<include name="src/net/chozabu/gexEdit/InputModule.java"/>

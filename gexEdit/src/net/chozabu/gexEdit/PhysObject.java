@@ -1,16 +1,19 @@
 package net.chozabu.gexEdit;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
@@ -22,7 +25,9 @@ public class PhysObject {
 	Body body;
 	private Sprite sprite;
 	BodyDef bodyDef;
+	Shape shape;
 	FixtureDef fixtureDef;
+	float scale = 1;
 
 	public void draw(SpriteBatch batch) {
 		if (body == null) {
@@ -39,56 +44,50 @@ public class PhysObject {
         //sprite.draw(batch);
 	}
 	public void setDefCircle(float rad,float x, float y, TextureRegion region, BodyType bType){		//sprite = pSprite;
-		sprite = new Sprite(region, 0, 0, 64, 64);
-		//sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
-		//sprite.setPosition(x,y);
-		sprite.setSize(rad*2,rad*2);
-		sprite.setPosition(x-sprite.getWidth()/2, y-sprite.getHeight()/2);
-		//sprite.setPosition(x,y);
-		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-		// First we create a body definition
-		bodyDef = new BodyDef();
-		// We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
-		bodyDef.type = bType;
-		// Set our body's starting position in the world
-		bodyDef.position.set(x, y);
+		setupSprite(x,y,rad,rad, region);
 		
-		// Create a circle shape and set its radius to 6
-		CircleShape circle = new CircleShape();
-		circle.setRadius(rad);
+		bodyDef = new BodyDef();
+		bodyDef.type = bType;
+		bodyDef.position.set(x, y);
 
-		// Create a fixture definition to apply our shape to
-		fixtureDef = new FixtureDef();
-		fixtureDef.shape = circle;
-		fixtureDef.density = 0.5f; 
-		fixtureDef.friction = 0.4f;
-		fixtureDef.restitution = 0.6f; // Make it bounce a little bit
+		setShapeCircle(rad);
+		setupFixture();
 	}
-	public void setDefSquare(float x, float y, float w,float h, TextureRegion region, BodyType bType){		//sprite = pSprite;
-		sprite = new Sprite(region, 0, 0, 64, 64);
-		//sprite.setPosition(-sprite.getWidth()/2, -sprite.getHeight()/2);
-		//sprite.setPosition(x,y);
-		sprite.setSize(w,h);
-		sprite.setPosition(x-sprite.getWidth()/2, y-sprite.getHeight()/2);
-		//sprite.setPosition(x,y);
-		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
-		// First we create a body definition
-		bodyDef = new BodyDef();
-		// We set our body to dynamic, for something like ground which doesn't move we would set it to StaticBody
-		bodyDef.type = bType;
-		// Set our body's starting position in the world
-		bodyDef.position.set(x, y);
-		
-		// Create a circle shape and set its radius to 6
+	public void setShapePoly(float w,float h){
+		if (shape!=null)shape.dispose();
 		PolygonShape poly = new PolygonShape();
 		poly.setAsBox(w, h);
-
-		// Create a fixture definition to apply our shape to
+		shape=poly;
+	}
+	public void setShapeCircle(float rad){
+		if (shape!=null)shape.dispose();
+		CircleShape circle = new CircleShape();
+		circle.setRadius(rad);
+		shape=circle;
+	}
+	public void setupFixture(){
 		fixtureDef = new FixtureDef();
-		fixtureDef.shape = poly;
+		fixtureDef.shape = shape;//TODO throw error or something if null?
 		fixtureDef.density = 0.5f; 
 		fixtureDef.friction = 0.4f;
-		fixtureDef.restitution = 0.6f; // Make it bounce a little bit
+		fixtureDef.restitution = 0.6f;
+	}
+	public void setupSprite(float x, float y, float w,float h, TextureRegion region){		//sprite = pSprite;
+		sprite = new Sprite(region, 0, 0, 64, 64);
+		sprite.setSize(w*2,h*2);
+		sprite.setPosition(x-sprite.getWidth()/2, y-sprite.getHeight()/2);
+		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
+	}
+	public void setDefBox(float x, float y, float w,float h, TextureRegion region, BodyType bType){		//sprite = pSprite;
+		setupSprite(x,y,w,h, region);
+
+		bodyDef = new BodyDef();
+		bodyDef.type = bType;
+		bodyDef.position.set(x, y);
+		bodyDef.angle=0f;
+		
+		setShapePoly(w,h);
+		setupFixture();
 	}
 
 	public void createFromDef(World world){		//sprite = pSprite;
@@ -106,8 +105,8 @@ public class PhysObject {
 		setDefCircle(rad,x, y, region, bType);
 		createFromDef(world);
 	}
-	public void createSquare(World world, float x, float y, float w, float h, TextureRegion region, BodyType bType) {
-		setDefSquare(x, y, w,h, region, bType);
+	public void createBox(World world, float x, float y, float w, float h, TextureRegion region, BodyType bType) {
+		setDefBox(x, y, w,h, region, bType);
 		createFromDef(world);
 	}
 	public void reset(World world){
@@ -120,5 +119,33 @@ public class PhysObject {
 	}
 	public void rmBody(World world){
 		world.destroyBody(body);
+	}
+	public void setDefAngle(float angle) {
+		bodyDef.angle=angle;
+		sprite.setRotation(angle/MathUtils.degreesToRadians);
+		System.out.println(angle);
+	}
+	public void setDefSize(float dist) {
+		sprite.setScale(dist*0.5f);
+		Shape.Type sType = shape.getType();
+		if (sType == Shape.Type.Circle){
+			CircleShape cs = (CircleShape)shape;
+			cs.setRadius(dist);
+		}else if (sType == Shape.Type.Polygon){
+			PolygonShape ps = (PolygonShape)shape;
+			/*int vCount = ps.getChildCount();
+			Vector2[] verts = new Vector2[vCount];
+			Vector2 cVert = Vector2.Zero;
+			for (int i = 0; i < vCount;i++){
+				ps.getVertex(i, cVert);
+				cVert.x*=1.1;
+				verts[i]=cVert;
+			}
+			System.out.println(vCount);
+			ps.set(verts);*/
+			ps.setAsBox(dist, dist);
+			//for ()
+		}
+		
 	}
 }
