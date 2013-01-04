@@ -22,7 +22,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 public class MyGdxGame implements ApplicationListener {
 	public OrthographicCamera camera;
 	private SpriteBatch batch;
-	private Texture texture;
+	private Texture texture, textureBox;
+    TextureRegion region, regionBox;//default texture region
     private World mWorld;
     
     boolean runStep = true;
@@ -43,7 +44,6 @@ public class MyGdxGame implements ApplicationListener {
     
     public BodyType bType = BodyType.DynamicBody;
     
-    TextureRegion region;//default texture region
 	
 	/* (non-Javadoc)
 	 * @see com.badlogic.gdx.ApplicationListener#create()
@@ -69,11 +69,13 @@ public class MyGdxGame implements ApplicationListener {
 		batch = new SpriteBatch();
 		
 		//
-		//texture = new Texture(Gdx.files.internal("data/libgdx.png"));
+		textureBox = new Texture(Gdx.files.internal("data/wall.png"));
+		textureBox.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         texture = new Texture(Gdx.files.internal("data/ball.png"));
 		texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		
+
 		region = new TextureRegion(texture, 0, 0, 64, 64);
+		regionBox = new TextureRegion(textureBox, 0, 0, 64, 64);
 
 
 		int bRad = 2;
@@ -98,19 +100,19 @@ public class MyGdxGame implements ApplicationListener {
         while (fc<25){
         	fc+=4;
             PhysObject sObj = new PhysObject();
-            sObj.createBox(mWorld, fc,-camHeight/2f,4,4, region,BodyType.StaticBody);
+            sObj.createBox(mWorld, fc,-camHeight/2f,4,4, regionBox,BodyType.StaticBody);
             physObject.add(sObj);
         }
         
         
-        //try out a random chain shape
+        /*/try out a random chain shape
 		ChainShape chainShape = new ChainShape();
 		chainShape.createLoop(new Vector2[] {new Vector2(-10, 10), new Vector2(-10, 5), new Vector2(10, 5), new Vector2(10, 11),});
 		BodyDef chainBodyDef = new BodyDef();
 		chainBodyDef.type = BodyType.StaticBody;
 		Body chainBody = mWorld.createBody(chainBodyDef);
 		chainBody.createFixture(chainShape, 0);
-		chainShape.dispose();
+		chainShape.dispose();//*/
 
 
         
