@@ -46,24 +46,21 @@ public class PhysObject {
         //sprite.setPosition(transform.getPosition().x-sprite.getWidth()/2+5, transform.getPosition().y-sprite.getHeight()/2);
         //sprite.draw(batch);
 	}
-	public void setDefCircle(float rad,float x, float y, TextureRegion region, BodyType bType){		//sprite = pSprite;
-		setupSprite(x,y,rad,rad, region);
-		
+	void setBodyDef(float x, float y, BodyType bType){
 		bodyDef = new BodyDef();
 		bodyDef.type = bType;
 		bodyDef.position.set(x, y);
-
+		//bodyDef.angle = set elsewhere? perhaps a default here?
+	}
+	public void setDefCircle(float rad,float x, float y, TextureRegion region, BodyType bType){		//sprite = pSprite;
+		setupSprite(x,y,rad,rad, region);
+		setBodyDef(x,y,bType);
 		setShapeCircle(rad);
 		setupFixture();
 	}
 	public void setDefBox(float x, float y, float w,float h, TextureRegion region, BodyType bType){		//sprite = pSprite;
 		setupSprite(x,y,w,h, region);
-
-		bodyDef = new BodyDef();
-		bodyDef.type = bType;
-		bodyDef.position.set(x, y);
-		//bodyDef.angle=0f;
-		
+		setBodyDef(x,y,bType);
 		setShapePoly(w,h);
 		setupFixture();
 	}
