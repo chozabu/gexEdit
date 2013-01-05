@@ -5,24 +5,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
-import com.badlogic.gdx.physics.box2d.joints.PrismaticJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
 public class SoftBody {
@@ -34,7 +23,9 @@ public class SoftBody {
 	
 	PhysObject centreBody;
 	public void draw(SpriteBatch batch) {
+		//Gdx.glu.
         Iterator<PhysObject> it=physObject.iterator();
+        
         while(it.hasNext())
         {
         	PhysObject cObj=(PhysObject)it.next();
@@ -73,13 +64,13 @@ public class SoftBody {
 			yP=lastY+yd*hardRad;
 		}
 		if (disSqr>hardRad*hardRad){//TODO unhardcode this
-			queCircle(1, xP, yP);
+			queCircle(2, xP, yP);
 		}
 	}
 	
 	public void queCircle(float rad,float x, float y) {
         PhysObject pObj = new PhysObject();
-        pObj.setDefCircle(1.f,x,y, region,BodyType.DynamicBody);
+        pObj.setDefCircle(rad,x,y, region,BodyType.DynamicBody);
         physObject.add(pObj);
 		lastX = x;
 		lastY = y;
@@ -201,7 +192,7 @@ public class SoftBody {
             		mjd2.initialize(cObj.body, lastObj2.body, cObj.body.getPosition(),lastObj2.body.getPosition());
             		mjd2.dampingRatio=0.5f;
             		mjd2.frequencyHz=5f;
-            		DistanceJoint tj = (DistanceJoint)world.createJoint(mjd2);
+            		world.createJoint(mjd2);
                 	if (lastObj3!=null) if(cObj.body != lastObj3.body){
                 		DistanceJointDef mjd3 = new DistanceJointDef();
                 		mjd3.initialize(cObj.body, lastObj3.body, cObj.body.getPosition(),lastObj3.body.getPosition());

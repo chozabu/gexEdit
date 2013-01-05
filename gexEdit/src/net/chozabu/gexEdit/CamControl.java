@@ -1,14 +1,11 @@
 package net.chozabu.gexEdit;
 
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.MathUtils.*;
 
-public class CamControl  {
+public class CamControl implements InputTool  {
 	public MyGdxGame root;
 	float lastX, lastY;
 	
-	public void setInfo (MyGdxGame rootIn){
+	public CamControl (MyGdxGame rootIn){
 		root=rootIn;
 	}
 
@@ -67,6 +64,12 @@ public class CamControl  {
 		root.PPM = root.pixWidth/root.camWidth/root.camera.zoom;
 		return false;*/
 		return false;
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

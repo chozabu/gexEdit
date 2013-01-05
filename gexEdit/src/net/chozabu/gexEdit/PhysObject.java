@@ -1,12 +1,9 @@
 package net.chozabu.gexEdit;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Region;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -176,6 +173,11 @@ public class PhysObject {
 		
 	}
 	public void defFromPos() {
+		bodyDef.position.set(body.getPosition().cpy());
+		bodyDef.angle = body.getAngle();
+	}
+	public void defFromScale() {
+		scaleShape(sprite.getScaleX()*2f, shape);
 		bodyDef.position.set(body.getPosition().cpy());
 		bodyDef.angle = body.getAngle();
 	}

@@ -1,17 +1,23 @@
 package net.chozabu.gexEdit;
 
+import java.util.List;
+
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
-public class InputModule implements InputProcessor {
+public class InputModule implements InputTool {
 	public MyGdxGame root;
 	DrawingControl drawingControl;
+	PaintingControl paintingControl;
 	CamControl camControl;
 	BoxAddingControl boxAddingControl;
 	DragControl dragControl;
 	LiveResizeControl liveResizeControl;
+	List<InputTool> tools;
+	InputTool cTool;
+	
+	boolean button1Down = false;
 	
 
 	public enum Modes {
@@ -24,13 +30,13 @@ public class InputModule implements InputProcessor {
 	public void setInfo (MyGdxGame rootIn){
 		root=rootIn;
 		mode = Modes.Interact;
-		drawingControl = new DrawingControl();
-		drawingControl.setInfo(root);
-		camControl = new CamControl();
-		camControl.setInfo(root);
+		drawingControl = new DrawingControl(root);
+		paintingControl = new PaintingControl(root);
+		camControl = new CamControl(root);
 		boxAddingControl = new BoxAddingControl(root);
 		dragControl = new DragControl(root);
 		liveResizeControl = new LiveResizeControl(root);
+		cTool = drawingControl;
 	}
 
 	@Override
@@ -57,25 +63,39 @@ public class InputModule implements InputProcessor {
 			//root.delPBs();
 		}
 
+
 		if (keycode == Keys.S)
 			root.bType = BodyType.StaticBody;
 		if (keycode == Keys.D)
 			root.bType = BodyType.DynamicBody;
 
+		
 		//set mode (drawing tool)//TODO make "tool" interface to set currentTool
-		if (keycode == Keys.Z)
+		if (keycode == Keys.Z){
+			cTool = dragControl;
 			mode = Modes.Interact;//running, transform when static?
-		if (keycode == Keys.X)
+		}
+		if (keycode == Keys.X){
+			cTool = dragControl;
 			mode = Modes.Interact;
+		}
 			//mode = Modes.Select;
-		if (keycode == Keys.C)
+		if (keycode == Keys.C){
+			cTool = camControl;
 			mode = Modes.Camera;//either
-		if (keycode == Keys.V)
+		}
+		if (keycode == Keys.V){
+			cTool = drawingControl;
 			mode = Modes.Drawing;//static, mostly
-		if (keycode == Keys.B)
+		}
+		if (keycode == Keys.B){
+			cTool = boxAddingControl;
 			mode = Modes.Box;//static, mostly
-		if (keycode == Keys.N)
+		}
+		if (keycode == Keys.N){
+			cTool = liveResizeControl;
 			mode = Modes.Resize;
+		}
 		//creationObject.createFromDef();
 		// TODO Auto-generated method stub
 		return false;
@@ -95,11 +115,16 @@ public class InputModule implements InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		Vector3 worldPos = new Vector3(screenX, screenY,0);
+		if (button == 1){
+			camControl.touchDown(screenX,screenY,pointer,button);
+			button1Down = true;
+	}
+		else
+			cTool.touchDown(screenX,screenY,pointer,button);
+		/*Vector3 worldPos = new Vector3(screenX, screenY,0);
 		root.camera.unproject(worldPos);
 		float xP = worldPos.x;
 		float yP = worldPos.y;
-
 		if (mode == Modes.Drawing)
 			drawingControl.touchDown(xP,yP,pointer,button);
 		if (mode == Modes.Camera)
@@ -111,12 +136,19 @@ public class InputModule implements InputProcessor {
 		}
 		if (mode == Modes.Resize)
 			liveResizeControl.touchDown(screenX,screenY,pointer,button);
+		*/
 		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		Vector3 worldPos = new Vector3(screenX, screenY,0);
+		if (button == 1){
+			camControl.touchUp(screenX,screenY,pointer,button);
+			button1Down = false;
+		}
+		else
+			cTool.touchUp(screenX,screenY,pointer, button);
+		/*Vector3 worldPos = new Vector3(screenX, screenY,0);
 		root.camera.unproject(worldPos);
 		float xP = worldPos.x;
 		float yP = worldPos.y;
@@ -128,13 +160,17 @@ public class InputModule implements InputProcessor {
 			dragControl.touchUp(screenX,screenY,pointer, button);
 		}
 		if (mode == Modes.Resize)
-			liveResizeControl.touchUp(screenX,screenY,pointer,button);
+			liveResizeControl.touchUp(screenX,screenY,pointer,button);*/
 		return false;
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		Vector3 worldPos = new Vector3(screenX, screenY,0);
+		if (button1Down)
+			camControl.touchDragged(screenX,screenY,pointer);
+		else
+			cTool.touchDragged(screenX,screenY,pointer);
+		/*Vector3 worldPos = new Vector3(screenX, screenY,0);
 		root.camera.unproject(worldPos);
 		float xP = worldPos.x;
 		float yP = worldPos.y;
@@ -148,7 +184,7 @@ public class InputModule implements InputProcessor {
 			dragControl.touchDragged(screenX,screenY,pointer);
 		}
 		if (mode == Modes.Resize)
-			liveResizeControl.touchDragged(screenX,screenY,pointer);
+			liveResizeControl.touchDragged(screenX,screenY,pointer);*/
 		return false;
 	}
 
@@ -168,6 +204,11 @@ public class InputModule implements InputProcessor {
 		//root.PPM = root.pixWidth/root.camWidth/root.camera.zoom;
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void update() {
+		
 	}
 
 }

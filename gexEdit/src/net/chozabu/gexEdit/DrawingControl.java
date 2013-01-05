@@ -1,20 +1,29 @@
 package net.chozabu.gexEdit;
 
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector3;
 
-public class DrawingControl {
+public class DrawingControl implements InputTool{
 	public MyGdxGame root;
 	//public float PPM;
 	private SoftBody creationObject;
 
 	float lastX, lastY;
 	float firstX, firstY;
-	public void setInfo (MyGdxGame rootIn){
+	public DrawingControl (MyGdxGame rootIn){
 		root=rootIn;
 	}
 
-	public boolean touchDown(float xP, float yP, int pointer, int button) {
-		// TODO Auto-generated method stub
+    @Override
+    public void update(){
+    	
+    }
+
+    @Override
+	public boolean touchDown(int xI, int yI, int pointer, int button) {
+		Vector3 testPoint = new Vector3(xI,yI,0);
+		root.camera.unproject(testPoint);
+		float xP=testPoint.x;
+		float yP=testPoint.y;
 		lastX = xP;
 		lastY = yP;
 		firstX = xP;
@@ -25,15 +34,24 @@ public class DrawingControl {
 		return false;
 	}
 
-	public boolean touchUp(float xP, float yP, int pointer, int button) {
+    @Override
+	public boolean touchUp(int xI, int yI, int pointer, int button) {
+		/*Vector3 testPoint = new Vector3(xI,yI,0);
+		root.camera.unproject(testPoint);
+		float xP=testPoint.x;
+		float yP=testPoint.y;*/
 		if(creationObject != null){
 			creationObject.createFromDef();
 		}
-		// TODO Auto-generated method stub
 		return false;
 	}
 
-	public boolean touchDragged(float xP, float yP, int pointer) {
+    @Override
+	public boolean touchDragged(int xI, int yI, int pointer) {
+		Vector3 testPoint = new Vector3(xI,yI,0);
+		root.camera.unproject(testPoint);
+		float xP=testPoint.x;
+		float yP=testPoint.y;
 		if (creationObject == null) return false;
 		creationObject.condAddAt(xP,yP);
 		float xd=xP-firstX;
@@ -45,6 +63,35 @@ public class DrawingControl {
 			lastX = xP;
 			lastY = yP;
 		}
+		return false;
+	}
+	@Override
+	public boolean keyDown(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 
