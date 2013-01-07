@@ -12,8 +12,11 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
@@ -44,6 +47,7 @@ public class MyGdxGame implements ApplicationListener {
     List<SoftBody> softBody;
     
     public BodyType bType = BodyType.DynamicBody;
+	private Sprite sprite;
     
 	
 	/* (non-Javadoc)
@@ -104,6 +108,11 @@ public class MyGdxGame implements ApplicationListener {
             sObj.createBox(mWorld, fc,-camHeight/2f,4,4, regionBox,BodyType.StaticBody);
             physObject.add(sObj);
         }
+        
+
+		sprite = new Sprite(region, 0, 0, 64, 64);
+		sprite.setSize(1,1);
+		sprite.setOrigin(sprite.getWidth()/2, sprite.getHeight()/2);
         
         
         /*/try out a random chain shape
@@ -180,6 +189,7 @@ public class MyGdxGame implements ApplicationListener {
 
 	@Override
 	public void render() {
+		inputModule.update();
         //mWorld.step(Gdx.app.getGraphics().getDeltaTime(), 3, 3);
 		if(frozen){
 			mWorld.setGravity(Vector2.Zero);
@@ -219,7 +229,22 @@ public class MyGdxGame implements ApplicationListener {
         	SoftBody cObj=(SoftBody)softit.next();
         	cObj.draw(batch);
         }
+        
+
+        List<Vector2> pList = inputModule.paintingControl.deformableMesh.points;
+        if(pList.size()>3){
+	        float pCount = 0f;
+	    	for (Vector2 p: pList){
+	    		pCount += 1.f/pList.size();
+	            sprite.setPosition(p.x-sprite.getWidth()/2, p.y-sprite.getHeight()/2);
+	            sprite.setScale(1.5f-pCount);
+	            //sprite.setRotation(bodyDef.angle*MathUtils.radiansToDegrees);
+	            sprite.setColor(1-pCount, 1, 1, 1.f-pCount/2);
+	            sprite.draw(batch);
+	    	}
+        }
 		batch.end();
+		inputModule.paintingControl.deformableMesh.renderLines(this);
 		debugRenderer.render(mWorld, camera.combined);
 	}
 

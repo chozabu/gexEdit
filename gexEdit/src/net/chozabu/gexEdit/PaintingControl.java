@@ -1,15 +1,43 @@
 package net.chozabu.gexEdit;
 
-import com.badlogic.gdx.InputProcessor;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
 public class PaintingControl implements InputTool{
+	
 	public MyGdxGame root;
+	public DeformableMesh deformableMesh;
 	//public float PPM;
 	//private SoftBody creationObject;
+	
+
+	private Sprite sprite;
+
+	public void setupSprite(float w,float h, TextureRegion region){		//sprite = pSprite;
+	}
+	
 	public PaintingControl (MyGdxGame rootIn){
 		root=rootIn;
+		deformableMesh = new DeformableMesh();
+		setupSprite(0.4f, 0.4f, root.region);
+	}
+	
+	public List<Vector2> tcAT(float x, float y){
+		List<Vector2> testCircle = new ArrayList<Vector2>();
+		float angle = 0;
+		for(angle=0;angle<MathUtils.PI*2;angle+=MathUtils.PI/10f){
+			float xp = MathUtils.cos(angle)*4+x;
+			float yp = MathUtils.sin(angle)*4+y;
+			testCircle.add(new Vector2(xp,yp));
+			//System.out.println("TCP = "+new Vector2(xp,yp));
+		}
+		return testCircle;
 	}
 	
 	void addCircle(Vector2 pos, float radius){
@@ -23,7 +51,10 @@ public class PaintingControl implements InputTool{
     }
 
     @Override
-	public boolean touchDown(int xI, int yI, int pointer, int button) {
+	public boolean touchDown(int x, int y, int pointer, int button) {
+    	Vector3 testPoint = Vector3.Zero;
+    	root.camera.unproject(testPoint.set(x, y, 0));
+    	deformableMesh.addLoop(tcAT(testPoint.x, testPoint.y));
 		/*Vector3 testPoint = new Vector3(xI,yI,0);
 		root.camera.unproject(testPoint);
 		float xP=testPoint.x;
@@ -51,7 +82,10 @@ public class PaintingControl implements InputTool{
 	}
 
     @Override
-	public boolean touchDragged(int xI, int yI, int pointer) {
+	public boolean touchDragged(int x, int y, int pointer) {
+    	Vector3 testPoint = Vector3.Zero;
+    	root.camera.unproject(testPoint.set(x, y, 0));
+    	deformableMesh.addLoop(tcAT(testPoint.x, testPoint.y));
 		/*Vector3 testPoint = new Vector3(xI,yI,0);
 		root.camera.unproject(testPoint);
 		float xP=testPoint.x;

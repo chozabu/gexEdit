@@ -2,7 +2,6 @@ package net.chozabu.gexEdit;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 public class BoxAddingControl implements InputTool {
 	MyGdxGame root;
@@ -48,9 +47,9 @@ public class BoxAddingControl implements InputTool {
         if (mode == Modes.Box)
         	pObj.setDefBox( worldPos.x,worldPos.y,2,2, root.regionBox,root.bType);
         else if (mode == Modes.Circle)
-        	pObj.setDefCircle(2, worldPos.x,worldPos.y, root.region,BodyType.DynamicBody);
+        	pObj.setDefCircle(2, worldPos.x,worldPos.y, root.region,root.bType);
         else
-        	pObj.setDefCircle(2, worldPos.x,worldPos.y, root.regionBox,BodyType.DynamicBody);
+        	pObj.setDefCircle(2, worldPos.x,worldPos.y, root.regionBox,root.bType);
         root.physObject.add(pObj);
 		return false;
 	}

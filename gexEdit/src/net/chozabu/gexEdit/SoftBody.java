@@ -14,21 +14,24 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 
+import com.badlogic.gdx.graphics.Mesh;
+
 public class SoftBody {
 	static float minDis;
 	List<PhysObject> physObject;
 	World world;
 	TextureRegion region;
 	boolean isLoop;
+	Mesh mesh;
 	
 	PhysObject centreBody;
 	public void draw(SpriteBatch batch) {
 		//Gdx.glu.
-        Iterator<PhysObject> it=physObject.iterator();
+        //Iterator<PhysObject> it=physObject.iterator();
         
-        while(it.hasNext())
+        for(PhysObject cObj: physObject)
         {
-        	PhysObject cObj=(PhysObject)it.next();
+        	//PhysObject cObj=(PhysObject)it.next();
         	cObj.draw(batch);
           //System.out.println("Value :"+value);
         }
@@ -74,6 +77,8 @@ public class SoftBody {
         physObject.add(pObj);
 		lastX = x;
 		lastY = y;
+		
+		
         
 	}
 	
@@ -103,26 +108,29 @@ public class SoftBody {
 	}
 	public void createFromDef(){
         Vector2 avgPos = new Vector2(0,0);
-        Iterator<PhysObject> it=physObject.iterator();
+        //Iterator<PhysObject> it=physObject.iterator();
         List<PhysObject> rems;
         rems = new LinkedList<PhysObject>();
-        while(it.hasNext())
+        //while(it.hasNext())
+        for (PhysObject cObj: physObject)
         {
-        	PhysObject cObj=(PhysObject)it.next();
+        	//PhysObject cObj=(PhysObject)it.next();
         	if(cObj.shape == null){
         		rems.add(cObj);
         	}
         }
-        it=rems.iterator();
-        while(it.hasNext())
+        //it=rems.iterator();
+        //while(it.hasNext())
+        for (PhysObject cObj: rems)
         {
-        	PhysObject cObj=(PhysObject)it.next();
+        	//PhysObject cObj=(PhysObject)it.next();
         		physObject.remove(cObj);
         }
-        it=physObject.iterator();
-        while(it.hasNext())
+        //it=physObject.iterator();
+        //while(it.hasNext())
+        for (PhysObject cObj: physObject)
         {
-        	PhysObject cObj=(PhysObject)it.next();
+        	//PhysObject cObj=(PhysObject)it.next();
         	cObj.createFromDef(world);
         	avgPos.add(cObj.body.getPosition());
         	//if (cObj.body == null)
@@ -140,18 +148,21 @@ public class SoftBody {
         	if(physObject.size()>2)
         	lastObj3 = physObject.get(physObject.size()-3);
         }
-        /*if (centreBody!=null){
+        /*
+        if (centreBody!=null){
         	centreBody.dispose();
         }
         centreBody = new PhysObject();
         centreBody.createCircle(world, 1, avgPos.x, avgPos.y, region, BodyType.DynamicBody);
         */
+        
         //lastObj2.createFromDef(world);
-        it=physObject.iterator();
+        //it=physObject.iterator();
         int index = 0; int olen = physObject.size();
-        while(it.hasNext())
+        //while(it.hasNext())
+        for (PhysObject cObj: physObject)
         {
-        	PhysObject cObj=(PhysObject)it.next();
+        	//PhysObject cObj=(PhysObject)it.next();
         	//if (cObj.body == null)
         	//cObj.createFromDef(world);
         	if (lastObj!=null){
@@ -177,10 +188,9 @@ public class SoftBody {
         		}
         		//*/
         		/*/connect centre sides//
-        		PhysObject poR = centreBody;
         		DistanceJointDef mjdR = new DistanceJointDef();
         		//PrismaticJointDef mjdR = new PrismaticJointDef();
-        		mjdR.initialize(cObj.body, poR.body, cObj.body.getPosition(),poR.body.getPosition());
+        		mjdR.initialize(cObj.body, centreBody.body, cObj.body.getPosition(),centreBody.body.getPosition());
         		mjdR.dampingRatio=0.5f;
         		mjdR.frequencyHz=5;
         		//Vector2 axis=cObj.body.getPosition().cpy().sub(poR.body.getPosition());

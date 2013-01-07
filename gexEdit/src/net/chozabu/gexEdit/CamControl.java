@@ -58,11 +58,9 @@ public class CamControl implements InputTool  {
 	}
 
 	public boolean scrolled(int amount) {
-		/*float am = amount*0.1f;
+		float am = amount*0.1f;
 		root.camera.zoom += am;
 		root.camera.update();
-		root.PPM = root.pixWidth/root.camWidth/root.camera.zoom;
-		return false;*/
 		return false;
 	}
 
