@@ -230,19 +230,9 @@ public class MyGdxGame implements ApplicationListener {
         	cObj.draw(batch);
         }
         
+        
+        inputModule.paintingControl.deformableMesh.renderSprites(batch,sprite);
 
-        List<Vector2> pList = inputModule.paintingControl.deformableMesh.points;
-        if(pList.size()>3){
-	        float pCount = 0f;
-	    	for (Vector2 p: pList){
-	    		pCount += 1.f/pList.size();
-	            sprite.setPosition(p.x-sprite.getWidth()/2, p.y-sprite.getHeight()/2);
-	            sprite.setScale(1.5f-pCount);
-	            //sprite.setRotation(bodyDef.angle*MathUtils.radiansToDegrees);
-	            sprite.setColor(1-pCount, 1, 1, 1.f-pCount/2);
-	            sprite.draw(batch);
-	    	}
-        }
 		batch.end();
 		inputModule.paintingControl.deformableMesh.renderLines(this);
 		debugRenderer.render(mWorld, camera.combined);

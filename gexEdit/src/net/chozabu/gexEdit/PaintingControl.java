@@ -32,7 +32,7 @@ public class PaintingControl implements InputTool{
 		List<Vector2> testCircle = new ArrayList<Vector2>();
 		float sAngle = 0;//MathUtils.random()*MathUtils.PI*2;
 		float radius = 2f;//1.f+MathUtils.random();
-		for(float angle=sAngle;angle<MathUtils.PI*2+sAngle;angle+=MathUtils.PI/10f){
+		for(float angle=sAngle;angle<MathUtils.PI*2+sAngle;angle+=MathUtils.PI/2f){
 			float xp = MathUtils.cos(angle)*radius+x;
 			float yp = MathUtils.sin(angle)*radius+y;
 			testCircle.add(new Vector2(xp,yp));

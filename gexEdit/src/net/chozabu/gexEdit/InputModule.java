@@ -28,7 +28,8 @@ public class InputModule implements InputTool {
 		boxAddingControl = new BoxAddingControl(root);
 		dragControl = new DragControl(root);
 		liveResizeControl = new LiveResizeControl(root);
-		cTool = paintingControl;
+		//cTool = paintingControl;
+		cTool = drawingControl;
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -23,6 +25,7 @@ public class DeformableMesh {
 	Area tArea;
 
 	List<Vector2> points;
+	List<InterSection> mInterSection;
 	
 	//Intersection is for a double linked list
 	//I should probably have separate lists to allow for n-poly operations.
@@ -57,6 +60,7 @@ public class DeformableMesh {
 	
 	//optimise this.
 	public void addLoop(List<Vector2> pointsA){
+		Log.o("\n");
 		
 		//Area na;
 		//na.
@@ -67,8 +71,8 @@ public class DeformableMesh {
 			return;
 		}
 		
-		/*
-		if(points.get(0).dst2(pointsA.get(0))<1f){
+		
+		/*if(points.get(0).dst2(pointsA.get(0))<1f){
 			Log.o("Too close for comfort! quitting");
 			return;
 		}*/
@@ -83,16 +87,17 @@ public class DeformableMesh {
 		//points.get(points.size());
 		InterSection lastA = null;
 		int indexA = 0;
-		Vector2 pI = new Vector2();
 		InterSection newI = new InterSection();
 		for (Vector2 n: pointsA){//TODO blast. these nested loops should be reversed to allow for multiple input!
 			int indexB = 0;
+			boolean gotA = false;
 			for (Vector2 o: points){
 				if(o.dst2(n)<0.01f){
 					//Log.o("two verts touchin, panic! quitting!!");
 					//return;
 				}
 				boolean overlapping = false;
+				Vector2 pI = new Vector2();
 				overlapping = Intersector.intersectSegments(lastN, n, lastO, o, pI);
 				if (overlapping){
 					newI = new InterSection();
@@ -104,12 +109,18 @@ public class DeformableMesh {
 					newI.pB2 = o;
 					newI.pointsA = pointsA;
 					newI.pointsB = points;
-					newI.lastA = lastA;//can't do lastB here!
-					if (lastA!=null)
-						lastA.nextA=newI;
+					if (!gotA){
+						newI.lastA = lastA;//can't do lastB here!
+						if (lastA!=null)
+							lastA.nextA=newI;
+					} else {
+						Log.o("double collision.");
+						return;
+					}
 					newI.pI = pI;
 					interSection.add(newI);
 					lastA=newI;
+					//break;//magic fix? or cover-up
 				}
 				lastO = o;
 				indexB++;
@@ -155,7 +166,7 @@ public class DeformableMesh {
 		InterSection endB = null;
 		for (Vector2 o: points){
 			for(InterSection sortI: interSection){
-				if (sortI.pB2 == o){
+				if (sortI.pB1 == o){
 					endB = sortI;
 					if (startB == null)
 						startB = sortI;
@@ -171,6 +182,8 @@ public class DeformableMesh {
 		startB.lastB = endB;
 
 		System.out.println("Sorted intersections for poly B");
+		
+		mInterSection = interSection;
 		
 
 		
@@ -221,10 +234,28 @@ public class DeformableMesh {
 			}
 		}
 		
+		/*Log.o("Simplifiying");
+		Vector2 olp = null;
+		Vector2 lp = null;
+		List<Vector2> reml = new ArrayList<Vector2>();
+		for (Vector2 p: points){
+			if (olp!=null)
+			if (lp.dst2(olp)< 0.3f && lp.dst2(p) < 0.3f){
+				reml.add(p);
+			}
+			olp = lp;
+			lp = p;
+		}
+		for (Vector2 p: reml){
+			points.remove(p);
+		}*/
+		
 		//makeLoop(tLoop.points,interSection, pointsA);
 		//points = tLoop.points;
 		Log.o("--------DONE------ found loops: "+loops.size());
 	}
+	
+	
 	List<Vector2> makeLoop(List<InterSection> interSection, List<Vector2> pointsA){
 		
 		List<Vector2> cLoop;
@@ -266,7 +297,7 @@ public class DeformableMesh {
 		int iCount = 0;
 		while (!complete){
 			iCount++;
-			//newOuterLoop.add(cI.pI);
+			newOuterLoop.add(currentIntersection.pI);
 			//System.out.println(currentIntersection.indexA);
 			if(cLoop == currentIntersection.pointsA){
 				Log.o("Aadding from: "+currentIntersection.indexA+" to: "+currentIntersection.nextB.indexA);
@@ -296,18 +327,33 @@ public class DeformableMesh {
 				//some re-writing should also happen to allow for n-objects, replacing this if block
 				System.out.println("Whoops! n-poly operations not implemented. or something broke...");
 			}
-			//newOuterLoop.add(cI.pI);
+			//newOuterLoop.add(currentIntersection.pI);
 			
 
 			Log.o("joined " + iCount +" intersections so far!");
 
-			currentIntersection.resolved = true;
+			
 			//quit the loop
 			if (currentIntersection == startedAt){
 				Log.o("finished");
+				currentIntersection.resolved = true;
 				complete = true;
 				break;//this *shouldnt* be needed 
+			}else if(currentIntersection.resolved == true){
+				Log.o("------------------------");
+				Log.o("--------warning---------");
+				Log.o("--this should never-----");
+				Log.o("-------happen-----------");
+				Log.o("------------------------");
+				Log.o("----looped without------");
+				Log.o("--reaching 1st point----");
+				Log.o("------------------------");
+				return null;
+			}else{
+				currentIntersection.resolved = true;
 			}
+
+			
 			
 			//quit if something goes wrong.
 			if (iCount > interSection.size()+2){
@@ -336,6 +382,33 @@ public class DeformableMesh {
 		for (InnerLoop il: innerLoop){
 			renderLinesSet(root, il.points);
 		}
+
+        if (mInterSection == null)return;
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        root.camera.update();
+        shapeRenderer.setProjectionMatrix(root.camera.combined);
+        shapeRenderer.begin(ShapeType.Line);
+        float cp = 0.2f;
+        float add = 0.3f;//1.f/mInterSection.size();
+		for (InterSection i: mInterSection){
+	        shapeRenderer.setColor(0, 1, 0, 1);
+        	shapeRenderer.line(i.pI.x, i.pI.y, i.nextA.pI.x, i.nextA.pI.y);
+        	//shapeRenderer.line(i.pI.x-0.1f, i.pI.y-0.1f, i.nextA.pI.x-0.1f, i.nextA.pI.y-0.1f);
+	        shapeRenderer.setColor(0, 0, 1, 1);
+        	shapeRenderer.line(i.pI.x-cp*0.1f, i.pI.y+cp*0.1f, i.nextB.pI.x-cp*0.1f, i.nextB.pI.y+cp*0.1f);
+        	cp+=add;
+		}
+        shapeRenderer.end();
+        shapeRenderer.begin(ShapeType.Circle);
+        cp = 0.2f;
+		for (InterSection i: mInterSection){
+	        shapeRenderer.setColor(0, 1, 0, 1);
+        	shapeRenderer.circle(i.pI.x, i.pI.y, cp);
+	        shapeRenderer.setColor(0, 0, 1, 1);
+        	shapeRenderer.circle(i.pI.x, i.pI.y, cp+add*0.5f);
+        	cp+=add;
+		}
+        shapeRenderer.end();
 	}
 	public void renderLinesSet(MyGdxGame root,List<Vector2> pointsIn){
 
@@ -352,6 +425,39 @@ public class DeformableMesh {
 	            lP = p;
 	    	}
 	        shapeRenderer.end();
+        }
+	}
+
+
+	public void renderSprites(SpriteBatch batch, Sprite sprite) {
+		/*renderSpritesSet(batch,sprite,points,1);
+		for (InnerLoop il: innerLoop){
+			renderSpritesSet(batch,sprite, il.points,0);
+		}*/
+        float pCount = 0f;
+        if (mInterSection == null)return;
+		for (InterSection i: mInterSection){
+	    		pCount += 1.f/mInterSection.size();
+	            sprite.setPosition(i.pI.x-sprite.getWidth()/2, i.pI.y-sprite.getHeight()/2);
+	            sprite.setScale(1.5f-pCount);
+	            //sprite.setRotation(bodyDef.angle*MathUtils.radiansToDegrees);
+	            sprite.setColor(1-pCount, 1, 1, 1.f-pCount/2);
+	            sprite.draw(batch);	
+		}
+	}
+
+	public void renderSpritesSet(SpriteBatch batch, Sprite sprite,List<Vector2> pList,float g) {
+        
+        if(pList.size()>3){
+	        float pCount = 0f;
+	    	for (Vector2 p: pList){
+	    		pCount += 1.f/pList.size();
+	            sprite.setPosition(p.x-sprite.getWidth()/2, p.y-sprite.getHeight()/2);
+	            sprite.setScale(1.5f-pCount);
+	            //sprite.setRotation(bodyDef.angle*MathUtils.radiansToDegrees);
+	            sprite.setColor(1-pCount, g, 1, 1.f-pCount/2);
+	            sprite.draw(batch);
+	    	}
         }
 	}
 }

@@ -92,6 +92,7 @@ public class LiveResizeControl implements InputTool {
     Vector2 target = new Vector2(); 
     float minObjSize = 1;
     @Override public boolean touchDragged (int x, int y, int pointer) {
+    		if (resMe == null)return false;
             // if a mouse joint exists we simply update
             // the target of the joint based on the new
             // mouse coordinates
